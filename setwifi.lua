@@ -1,4 +1,3 @@
---setwifi.lua
 
 print("Entering wifi Setup..")
 
@@ -28,9 +27,11 @@ srv:listen(80,function(conn)
         end
         local _GET = {}
         if (vars ~= nil)then
-            for k, v in string.gmatch(vars, "(%w+)=(%w+)&*") do
-                _GET[k] = v
-            end
+			for w in (vars .. "&"):gmatch("([^&]*)&") do  
+				for k, v in string.gmatch(w, "(%S+)=(%S+)&*") do
+				  _GET[k] = v
+				end
+			end
         end
 
         if path == "/favicon.ico" then
@@ -50,26 +51,22 @@ srv:listen(80,function(conn)
             buf = buf.."<input type='text' name='password' value='' maxlength='100' width='100px' placeholder='empty if AP is open' />"
             buf = buf.."<p><input type='submit' value='Submit' style='height: 25px; width: 100px;'/></p>"
             buf = buf.."</body></html>"
-    
         elseif (vars ~= nil) then
-            restarting = "<html><body style='width:90%;margin-left:auto;margin-right:auto;background-color:LightGray;'><h1>Restarting...You may close this window.</h1></body></html>"
-            client:send(restarting);
-            client:close();
-            if(_GET.dssid)then
-                ssid = _GET.dssid
-                password1 = _GET.password
-                if (_GET.ssid) then
-                    ssid = _GET.ssid
-                end
-                if (_GET.password) then
-                    password1 = _GET.password
-                end
+			restarting = "<html><body style='width:90%;margin-left:auto;margin-right:auto;background-color:LightGray;'><h1>Restarting...You may close this window.</h1></body></html>"
+			client:send(restarting);
+			client:close();
+			if(_GET.dssid)then
+				ssid = _GET.dssid
+			end
+			if (_GET.ssid) then
+				ssid = _GET.ssid
+			end
+			if (_GET.password) then
+				password1 = _GET.password
+			end
 			print("Setting to: "..ssid..":"..password1)
-			-- remove "Prakash" from file system.
 			file.remove("Prakash.lua")
-			-- open 'Prakash.lua' in 'a+' mode
 			file.open("Prakash.lua", "a+")
-			-- write to the end of the file
 			file.writeline('wifi.setmode(wifi.STATION)')
 			file.writeline('wifi.sta.config("'..ssid..'","'..password1..'")')
 			file.writeline('tmr.alarm(0,1000, 1, function()')
@@ -82,12 +79,9 @@ srv:listen(80,function(conn)
 			file.writeline('end)')
 			file.close()
 			node.restart()
-            end
         end
-
         client:send(buf);
         client:close();
         collectgarbage();
-    end)
-    
+    end) 
 end)
