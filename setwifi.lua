@@ -71,7 +71,7 @@ srv:listen(80,function(conn)
 			file.open("Prakash.lua", "a+")
 			-- write to the end of the file
 			file.writeline('wifi.setmode(wifi.STATION)')
-			file.writeline('wifi.sta.config("'..ssid..'","'..password1'")')
+			file.writeline('wifi.sta.config("'..ssid..'","'..password1..'")')
 			file.writeline('tmr.alarm(0,1000, 1, function()')
 			file.writeline('if wifi.sta.getip()==nil then')
 			file.writeline('print(" Wait for IP address!")')
